@@ -197,3 +197,117 @@ f 5
 (|/) 20 10 40 30
 (&/) 20 10 40 30 
 
+/ +/
+sum 1+til 10
+
+/ */ , note that it is missing "o"
+prd 1+til 10
+
+/ |/
+max 20 10 50 30 
+
+/&/
+min 20 10 40 30
+
+/ converts a binary function into a unary aggregate function
+/one that collapses a list to an atom
+
+
+(*/) 2#1.4142135623730949
+
+n:5
+
+(*/) n#10
+
+/scan = \ 
+/same as over, but returns all of the intermediate values
+(+\) 1+til 10 /1 3 6 10 15 21 28 36 45 55
+
+(*\) 1+til 10 /1 2 6 24 120 720 5040 40320 362880 3628800
+
+(|\) 20 10 40 30 /20 20 40 40
+
+(&\) 20 10 40 30 /20 10 10 10
+
+/common applications of scan
+sums 1+til 10 / this is +\
+
+prds 1+til 10 / this is *\ 
+
+maxs 20 10 40 30 / this is |\
+
+mins 20 10 40 30 / this is &\
+
+/1.12 Fibonaci Numbers
+F0: 1 1 
+
+-2#F0
+
+sum -2#F0
+
+F0, sum -2#F0
+
+/declarative programming, say what to do not how to implement it
+
+/fib function
+{x,sum -2#x}
+
+{x,sum -2#x}[1,1]
+
+{x,sum -2#x}[1,1,2]
+
+/ "/" overload function, specify base case, and number of times
+/to iterate
+10 {x,sum -2#x}/ 1 1
+
+/1.13 Example: Newton's Method for nth roots skip for now
+/1.14 Example: Fifo Allocation: skip for now
+
+/1.15 Dictionaries and Tables 101
+/Dictionaries are modeled after key value pairs
+/key!value
+`a`b`c!10 20 30
+
+d:`a`b`c!10 20 30
+
+d[`a]
+
+`c1`c2!(10 20 30;1.1 2.2 3.3)
+
+dc:`c1`c2!(10 20 30;1.1 2.2 3.3)
+
+dc[`c1][0]
+
+dc[`c2][1]
+
+/indexing at depth
+dc[`c1;0]
+dc[`c1;1]
+dc[`c1;2]
+
+/elided
+dc[`c1;]
+
+dc[`c2;]
+
+dc[;0]
+
+dc[;1]
+
+dc[;2]
+
+/flip operator
+t:flip `c1`c2!(10 20 30; 1.1 2.2 3.3)
+
+t[0; `c1]
+t[1; `c1]
+t[2; `c2]
+t[0; `c2]
+t[; `c2]
+t[0;]
+
+/flipped column dictionar called a table is a first class entity in q
+
+t[0]
+t[1]
+t[2]
