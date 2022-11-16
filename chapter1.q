@@ -306,7 +306,7 @@ t[0; `c2]
 t[; `c2]
 t[0;]
 
-/flipped column dictionar called a table is a first class entity in q
+/flipped column dictionary called a table is a first class entity in q
 
 t[0]
 t[1]
