@@ -261,7 +261,85 @@ F0, sum -2#F0
 10 {x,sum -2#x}/ 1 1
 
 /1.13 Example: Newton's Method for nth roots skip for now
+x0:1.0 /base case
+
+/first approximation
+x0-((x0*x0)-2)%2*x0
+
+/abstract function that computes the n+1 approximation in terms of xn
+{[xn] xn-((xn*xn)-2)%2*xn}
+
+/using it to run the first two iterations 
+{[xn] xn-((xn*xn)-2)%2*xn}[1.0]
+{[xn] xn-((xn*xn)-2)%2*xn}[1.5]
+
+/overload functon that applies the function recursively
+{[xn] xn-((xn*xn)-2)%2*xn}/[1.5]
+
+/to witness convergence, set floating point display to maximum
+\P 0 / note upper case P
+
+/2- switch the iterator from over to scan so that we can see results 
+{[xn] xn-((xn*xn)-2)%2*xn}\[1.0]
+
+{[c; xn] xn-((xn*xn)-c)%2*xn}
+
+{[c; xn] xn-((xn*xn)-c)%2*xn}[2.0;]
+
+{[c; xn] xn-((xn*xn)-c)%2*xn}[2.0;]/[1.0]
+
+{[p; c; xn] xn-(((*/)p#xn)-c)%p*(*/)(p-1)#xn}
+
+{[p; c; xn] xn-(((*/)p#xn)-c)%p*(*/)(p-1)#xn}[2; 3.0;]/[1.0]
+
+{[p; c; xn] xn-(((*/)p#xn)-c)%p*(*/)(p-1)#xn}[5; 7.0;]/[1.0]
+
+/It is amazing what can be done in a single line of code when you strip out unnecessary programming frou-frou. Perhaps this is intimidating to the qbie, but now that you have taken the blue pill, you will feel right as rain
+
 /1.14 Example: Fifo Allocation: skip for now
+buys:2 1 4 3 5 4f
+
+sell:12f
+
+sum buys
+
+/make the sequence level off at the sell amount
+sell&sums buys
+
+/built in function that returns the successfive differences of a numeric list
+deltas 1 2 3 4 5 
+
+deltas 10 15 20 
+
+deltas sell&sums buys 
+
+buys: 2 1 4 3 5 4f
+sells: 2 4 3 2 
+
+sums[buys]
+sums[sells]
+
+/cap each cumulative buy with each cumulative sell
+2&sums[buys]
+
+6&sums[buys]
+
+9&sums[buys]
+
+11&sums[buys]
+
+sums[sells] &\: sums[buys]
+
+/deltas to unwind in a vertical direction
+deltas sums[sells]&\:sums[buys]
+
+(1 2 3; 10 20)
+
+count(1 2 3; 10 20)
+
+count each(1 2 3;10 20)
+
+deltas each deltas sums[sells]&\:sums[buys]
 
 /1.15 Dictionaries and Tables 101
 /Dictionaries are modeled after key value pairs
@@ -311,3 +389,112 @@ t[0;]
 t[0]
 t[1]
 t[2]
+
+/a table is a flipped column dictionary
+/it is also a list of record dictionaries 
+
+([] c1: 10 20 30; c2: 1.1 2.2 3.3)
+
+/square brackets are necessary to differentiate a table from a list
+/: above is not assignment, it is merely a syntactice marker separating the name from the column
+/column names in table definition are not symbols
+
+/1.16 qsql
+/fundamental q-sql operation is the select template
+t:([] c1:1000+til 6; c2:`a`b`c`a`b`c;c3:10*1+til 6)
+
+select from t
+
+select c1, val:2*c3 from t
+
+t:([] c1:1000+til 6; c2:`a`b`c`a`b`a; c3:10*1+til 6)
+
+select count c1, sum c3 by c2 from t
+
+/?
+select count c2 by ovrund:c3<=40 from t
+
+update c3:10*c3 from t where c2=`a
+
+/sort a table ascending by columns 
+`c2 xasc t
+
+/example 1.17 trades table
+
+/? generates pseudo random data
+10?20
+
+/randomly generate 10 floats between 0.0 and 100.0
+10?100.0
+
+/make 10 random selections from the items in a list 
+10?`aapl`ibm
+
+/construct a list of 1,000,000 random dates in the month of jan 2015
+dts:2015.01.01+1000000?31
+
+/next a list of a 1,000,000 timespans
+tms:1000000?24:00:00.000000000
+
+/list of a 1,000,000 tickers chosen from appl goog and ibm
+syms:100000?`aapl`goog`ibm
+
+/a list of 1,000,000 volumes given as positive lots of 10
+vols:10*1+1000000?1000
+
+/create a list of 1,000,000 prices in cents unfiromly distributed within
+/10% of 100.0
+pxs: 90.0+(1000000?2001)%100
+
+dts:2015.01.01+1000000?31
+tms:1000000?24:00:00.000000000
+syms:1000000?`aapl`goog`ibm
+vols:10*1+1000000?1000
+pxs:90.0+(1000000?2001)%100
+trades:([] dt:dts; tm:tms; sym:syms; vol:vols; px:pxs)
+5#trades
+
+/sort trades in temporal order
+trades:`dt`tm xasc trades
+
+/adjust the prices for goog and ibm by scaling
+trades:update px:6*px from trades where sym=`goog
+trades:update px:2*px from trades where sym=`ibm
+
+5#trades
+
+/perform some basic queries as sanity checks
+select avg px, avg vol by sym from trades
+
+/we expect the minimum and max price for each sym to
+/be the end points of the uniform range
+select min px, max px by sym from trades
+
+/calculate vwap
+5 xbar til 15
+/left operand of xbar = interval width
+/right operand of xbar =  list of numerical values
+
+/also require wavg a binary function that computes the average 
+/of numerical values in its right operand weighted by the values of its left operand
+1 2 3 wavg 50 60 70
+
+select vwap:vol wavg px by sym,bkt:100000000 xbar tm from trades
+
+/vwap is the price weighted by the volume averaged out, then bucketed
+/into 100-millisecond buckets 
+
+select max px-mins px from trades where sym=`aapl
+
+/1.18 file i/o 101
+"a"
+" "
+"_"
+
+/"a" is an atom, but not the same as symbol `a
+
+("s";"t"; "r"; "i"; "n"; "g")
+
+count "string"
+
+count `string
